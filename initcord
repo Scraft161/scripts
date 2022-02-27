@@ -25,6 +25,7 @@ sudo mv $HOME/discord-install-tmp/app.asar /opt/discord/app.asar
 
 # Create required directories and symlink properly
 sudo mkdir /etc/kernel-mod
+sudo chmod 777 /etc/kernel-mod
 ln -s /etc/kernel-mod $HOME/kernel-mod
 
 # install kernel
