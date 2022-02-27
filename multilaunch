@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+# Try importing the settings we need, otherwise use default
+if [ -f "$HOME/.config/scraft/config/scriptConfig" ]; then
+	source "$HOME/.config/scraft/config/scriptConfig"
+else
+	SCDF_MangoLAunch=false
+fi
+
+# List of instance names and launch options, make sure to properly wrap arguments
+declare -A instances=(
+	[Scraftia]="-l 'Scraftia - SMP'"
+	[Wynncraft]="-l 'Wynntils' -s 'play.wynncraft.com'"
+	[Hypixel]="-l 'Scraft PvP' -s 'play.hypixel.net'"
+)
+
+if [ "$1" = "-v" ]; then
+	echo "---[ Array ]---"
+	echo "${instances[@]}"
+
+	echo "---[ Keys ]---"
+	for key in "${!instances[@]}"; do
+		echo "$key"
+	done
+
+	echo "[Info]: Passing instance list to dmenu."
+fi
+
+instance=$(dmenu -p "Launch:" -l 10 <<< $(for key in "${!instances[@]}"; do echo "$key";done))
+
+if [ "$instance" = "" ]; then
+	if [ "$1" = "-v" ]; then
+		echo "[Info]: No instance chosen, exiting."
+	fi
+	exit
+fi
+
+if [ "$1" = "-v" ]; then
+	echo "---[ Selected instance ]---"
+	echo "$instance"
+
+	echo "---[ Value ]---"
+	echo ${instances[${instance}]}
+
+	echo "[Info]: Launching minecraft!"
+fi
+
+notify-send "Launching: ${instance}"
+
+# We use eval to launch multimc with our selected instance
+if [ "$SCDF_MangoLAunch" = true ]; then
+	eval mangohud multimc ${instances[${instance}]}
+else
+	eval multimc ${instances[${instance}]}
+fi

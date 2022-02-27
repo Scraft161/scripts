@@ -1,0 +1,38 @@
+#!/bin/sh
+#/---
+#Created by:  Scraft161
+#Function:    Show a menu with all user scripts and run it
+#Usage:       scriptmenu [Tool]
+#Description: Show a menu using the preffered selection tool !{Config/ScriptConfig/#SCDF_SelectionTool}, and then run the selected script
+#---/
+
+# Check if selectionTool is given, and look in the config if not
+if [ -z "$1" ]; then
+	. "${HOME}/.config/scraft/config/scriptConfig"
+else
+	SCDF_SelectionTool=$1
+fi
+
+case $SCDF_SelectionTool in
+	"")
+		printf '%s\n' "[ERR]: No selection tool set in config."
+		exit 1
+		;;
+	"dmenu")
+		selection=$(cd "${HOME}/scripts/" || exit; find * -type f | dmenu -l 20)
+		;;
+	"rofi")
+		selection=$(cd "${HOME}/scripts/" || exit; find * -type f | rofi -dmenu)
+		;;
+	"xprompt")
+		selection=$(cd "${HOME}/scripts/" || exit; find * -type f | xprompt)
+		;;
+	*)
+		printf '%s\n' "[ERR]: Provided selection tool is not valid, please make sure SCDF supports it."
+		exit 1
+		;;
+esac
+
+"${HOME}/scripts/${selection}"
+
+sleep 1

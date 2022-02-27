@@ -1,0 +1,38 @@
+#!/bin/sh
+#/---
+#Created by:  Scraft161
+#Function:    Reinstall discord and it's client mods
+#Usage:       record
+#Description: reinstalls discord, openasar, and kernel in case a discord update fucks things up again.
+#---/
+
+# Create download directory
+mkdir "$HOME/record-tmp"
+
+# Download all the assets we need
+printf '%s\n' "[Info]: Downloading assets, this shouldn't take long and if it does: stand by as you will be promped for your password after."
+wget -O $HOME/record-tmp/app.asar https://github.com/GooseMod/OpenAsar/releases/download/nightly/app.asar
+wget -O $HOME/record-tmp/kernel-installer-x86_64-linux https://github.com/kernel-mod/installer-cli/releases/download/refs%2Fheads%2Fmaster/kernel-installer-x86_64-linux
+wget -O $HOME/record-tmp/kernel.asar https://github.com/kernel-mod/electron/releases/download/2021-11-26-21-53-07/kernel.asar
+
+
+# Remove discord and residual installation files
+sudo pacman -Rs discord
+sudo rm -rf /opt/discord/
+
+# reinstall vanilla discord
+sudo pacman -S discord
+
+# download and install openasar
+sudo mv /opt/discord/resources/app.asar /opt/discord/resources/app.asar.bak
+sudo mv $HOME/record-tmp/app.asar /opt/discord/resources/app.asar
+
+# Download the kernel asar (since we're doing a new install we're also updating everything)
+sudo rm /etc/kernel-mod/kernel.asar
+sudo mv "$HOME/record-tmp/kernel.asar" /etc/kernel-mod/kernel.asar
+
+# Install kernel
+sudo $HOME/Downloads/kernel-installer-x86_64-linux -i /opt/discord -k /etc/kernel-mod
+rm $HOME/record-tmp/kernel-installer-x86_64-linux
+
+rmdir $HOME/record-tmp
