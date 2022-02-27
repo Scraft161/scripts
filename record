@@ -26,6 +26,7 @@ sudo pacman -S discord
 # download and install openasar
 sudo mv /opt/discord/resources/app.asar /opt/discord/resources/app.asar.bak
 sudo mv $HOME/record-tmp/app.asar /opt/discord/resources/app.asar
+sudo chmod 777 /opt/discord/resources/app.asar
 
 # Download the kernel asar (since we're doing a new install we're also updating everything)
 sudo rm /etc/kernel-mod/kernel.asar
