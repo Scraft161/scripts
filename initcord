@@ -22,6 +22,7 @@ sudo pacman -S discord
 # Install OpenAsar
 sudo mv /opt/discord/resources/app.asar /opt/discord/resources/app.asar.bak
 sudo mv $HOME/discord-install-tmp/app.asar /opt/discord/app.asar
+sudo chmod 777 /opt/discord/resources/app.asar
 
 # Create required directories and symlink properly
 sudo mkdir /etc/kernel-mod
