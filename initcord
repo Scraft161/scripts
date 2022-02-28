@@ -2,38 +2,91 @@
 #/---
 #Created by:  Scraft161
 #Function:    initialize Discord with my preferred client mods
-#Usage:       initcord
+#Usage:       initcord path
 #Description: cleans discord install, and installs openasar and kernel.
 #---/
+
+# Obligatory help function for the lost kids
+help() {
+	cat << EOF
+Created by:  Scraft161
+Function:    initialize Discord with my preferred client mods
+Usage:       initcord path
+Description: cleans discord install, and installs openasar and kernel.
+
+SYNOPSIS
+	initcord path
+
+DESCRIPTION
+	automatically install OpenAsar and Kernel in the user's client.
+
+	Kernel gets installed to "/etc/kernel/" with a symlink in your home for easy access.
+
+	NOTE ON A MULTI-USER SYSTEM: Please do not use this script, the kernel folder is accessible by all users!
+	If you do wish to continue, make sure you know what you're getting into.
+
+	Options are as follows:
+
+	help, --help, -h
+		print this help message.
+
+	Any other options are interpreted as the path to the discord installation.
+	On Arch this path is "/opt/discord/"
+	On most other distro's this is "/usr/share/discord"
+
+	For more info check out: https://github.com/saintwithataint/Client-Modding-Guide/blob/main/PimpMyClient.md
+EOF
+}
+
+# Check for command line arguments
+case "${1}" in
+	"")
+		help
+		exit
+		;;
+	"help|-h|--help")
+		help
+		exit
+		;;
+	*)
+		printf '%s\n' "[Info]: Using discord path: ${1}"
+		# Remove '/' from string if given by user since it could cause issues.
+		if [ "$(printf '%s' "${1}" | tail -c 1)" = "/" ]; then
+			path="${1%?}"
+		else
+			path=${1}
+		fi
+		;;
+esac
 
 # Create remporary download directory and download required assets
 mkdir "$HOME/discord-install-tmp"
 
 printf '%s\n' "[Info]: Downloading assets, we will start the installation after, so stand by"
 
-wget -O $HOME/discord-install-tmp/app.asar https://github.com/GooseMod/OpenAsar/releases/download/nightly/app.asar
-wget -O $HOME/discord-install-tmp/kernel-installer-x86_64-linux https://github.com/kernel-mod/installer-cli/releases/download/refs%2Fheads%2Fmaster/kernel-installer-x86_64-linux
-wget -O $HOME/discord-install-tmp/kernel.asar https://github.com/kernel-mod/electron/releases/download/2021-11-26-21-53-07/kernel.asar
+wget -O "$HOME/discord-install-tmp/app.asar" "https://github.com/GooseMod/OpenAsar/releases/download/nightly/app.asar"
+wget -O "$HOME/discord-install-tmp/kernel-installer-x86_64-linux" "https://github.com/kernel-mod/installer-cli/releases/download/refs%2Fheads%2Fmaster/kernel-installer-x86_64-linux"
+wget -O "$HOME/discord-install-tmp/kernel.asar" "https://github.com/kernel-mod/electron/releases/download/2021-11-26-21-53-07/kernel.asar"
 
-# Remove discord installation files to make sure we are dealing with a fresh install.
-sudo rm -rf /opt/discord
-sudo pacman -S discord
+# [ARCH ONLY]: Remove discord installation files to make sure we are dealing with a fresh install.
+if [ -x "/usr/bin/pacman" ]; then
+	sudo rm -rf /opt/discord
+	sudo pacman -S discord
+fi
 
 # Install OpenAsar
-sudo mv /opt/discord/resources/app.asar /opt/discord/resources/app.asar.bak
-sudo mv $HOME/discord-install-tmp/app.asar /opt/discord/app.asar
-sudo chmod 777 /opt/discord/resources/app.asar
+sudo mv "${path}/resources/app.asar" "${path}/resources/app.asar.bak"
+sudo mv "$HOME/discord-install-tmp/app.asar" "${path}/app.asar"
 
 # Create required directories and symlink properly
 sudo mkdir /etc/kernel-mod
-sudo chmod 777 /etc/kernel-mod
-ln -s /etc/kernel-mod $HOME/kernel-mod
+ln -s /etc/kernel-mod "$HOME/kernel-mod"
 
 # install kernel
-sudo mv $HOME/discord-install-tmp/kernel.asar /etc/kernel-mod/kernel.asar
-sudo $HOME/discord-install-tmp/kernel-installer-x86_64-linux -i /opt/discord -k /etc/kernel-mod
-rm $HOME/discord-install-tmp/kernel-installer-x86_64-linux
+sudo mv "$HOME/discord-install-tmp/kernel.asar" /etc/kernel-mod/kernel.asar
+sudo "$HOME/discord-install-tmp/kernel-installer-x86_64-linux" -i "${path}" -k /etc/kernel-mod
+rm "$HOME/discord-install-tmp/kernel-installer-x86_64-linux"
 
 # remove installation files
-rm $HOME/discord-install-tmp/*
-rmdir $HOME/discord-install-tmp
+rm "$HOME"/discord-install-tmp/*
+rmdir "$HOME"/discord-install-tmp
