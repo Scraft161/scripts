@@ -10,6 +10,8 @@ OpenAsar can be configured at `~/.config/discord/settings.json` [more info](http
 Kernel config is at `/etc/kernel-mod/` and is symlinked to `~/kernel-mod/`  
 Some usefull kernel modules can be found [here (Discord channel)](https://discord.com/channels/891039687785996328/899717501120806963).
 
+Note: OpenAsar now blocks discord tracking, there should no longer be a need to disable it in kernel.
+
 Only works on Arch Linux
 
 ### record
